@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDo &amp; メモ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>ToDo &amp; メモ</h1>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="todo">ToDo</button>
+      <button class="tab" data-tab="memo">メモ</button>
+    </nav>
+
+    <!-- ToDo Section -->
+    <section id="todo" class="section active">
+      <div class="input-row">
+        <input type="text" id="todo-input" placeholder="タスクを入力..." maxlength="200">
+        <button id="todo-add">追加</button>
+      </div>
+      <ul id="todo-list"></ul>
+      <p id="todo-empty" class="empty-msg">タスクがありません</p>
+    </section>
+
+    <!-- Memo Section -->
+    <section id="memo" class="section">
+      <textarea id="memo-input" placeholder="メモを入力..."></textarea>
+      <div class="memo-actions">
+        <span id="memo-saved" class="saved-indicator"></span>
+        <button id="memo-save">保存</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
