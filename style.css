@@ -184,10 +184,132 @@ button:active {
   padding: 32px 0;
 }
 
-/* Memo */
+/* Memo - List view */
+.memo-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.memo-count {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+#memo-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.memo-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.memo-card:hover {
+  border-color: #c7d2fe;
+  background: #f5f3ff;
+}
+
+.memo-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.memo-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.memo-card-preview {
+  font-size: 0.82rem;
+  color: #9ca3af;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.memo-card-date {
+  font-size: 0.78rem;
+  color: #d1d5db;
+  flex-shrink: 0;
+}
+
+.memo-card .delete-btn {
+  background: none;
+  color: #d1d5db;
+  padding: 4px 8px;
+  font-size: 1.1rem;
+  line-height: 1;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: color 0.2s, background 0.2s;
+}
+
+.memo-card .delete-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+/* Memo - Edit view */
+#memo-edit-view {
+  display: none;
+}
+
+.memo-edit-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.back-btn {
+  background: none;
+  color: #4f46e5;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1.5px solid #e0e7ff;
+}
+
+.back-btn:hover {
+  background: #eef2ff;
+}
+
+.danger-btn {
+  background: none;
+  color: #ef4444;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1.5px solid #fee2e2;
+  margin-left: auto;
+}
+
+.danger-btn:hover {
+  background: #fee2e2;
+}
+
 textarea {
   width: 100%;
-  height: 300px;
+  height: 340px;
   padding: 14px;
   border: 1.5px solid #e5e7eb;
   border-radius: 10px;
@@ -201,14 +323,6 @@ textarea {
 
 textarea:focus {
   border-color: #4f46e5;
-}
-
-.memo-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 12px;
 }
 
 .saved-indicator {
