@@ -246,3 +246,4 @@ document.getElementById('memo-delete-current').addEventListener('click', () => {
 
 // Init
 renderTodos();
+renderMemoList();
