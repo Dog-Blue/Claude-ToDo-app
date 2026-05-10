@@ -27,10 +27,23 @@
 
     <!-- Memo Section -->
     <section id="memo" class="section">
-      <textarea id="memo-input" placeholder="メモを入力..."></textarea>
-      <div class="memo-actions">
-        <span id="memo-saved" class="saved-indicator"></span>
-        <button id="memo-save">保存</button>
+      <!-- List view -->
+      <div id="memo-list-view">
+        <div class="memo-list-header">
+          <span id="memo-count" class="memo-count"></span>
+          <button id="memo-new">+ 新規メモ</button>
+        </div>
+        <ul id="memo-list"></ul>
+        <p id="memo-empty" class="empty-msg">メモがありません</p>
+      </div>
+      <!-- Edit view -->
+      <div id="memo-edit-view">
+        <div class="memo-edit-header">
+          <button id="memo-back" class="back-btn">← 戻る</button>
+          <span id="memo-saved" class="saved-indicator"></span>
+          <button id="memo-delete-current" class="danger-btn">削除</button>
+        </div>
+        <textarea id="memo-input" placeholder="メモを入力..."></textarea>
       </div>
     </section>
   </div>

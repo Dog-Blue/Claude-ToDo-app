@@ -1,4 +1,4 @@
-const STORAGE_KEYS = { todos: 'app_todos', memo: 'app_memo' };
+const STORAGE_KEYS = { todos: 'app_todos', memos: 'app_memos' };
 
 // --- Tab switching ---
 document.querySelectorAll('.tab').forEach(tab => {
@@ -85,27 +85,163 @@ document.getElementById('todo-input').addEventListener('keydown', e => {
 });
 
 // --- Memo ---
-const memoInput = document.getElementById('memo-input');
-const memoSaved = document.getElementById('memo-saved');
+let currentMemoId = null;
+let autoSaveTimer = null;
 let savedTimer = null;
 
-memoInput.value = localStorage.getItem(STORAGE_KEYS.memo) || '';
+const memoInput = document.getElementById('memo-input');
+const memoSaved = document.getElementById('memo-saved');
 
-document.getElementById('memo-save').addEventListener('click', () => {
-  localStorage.setItem(STORAGE_KEYS.memo, memoInput.value);
+function loadMemos() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.memos)) || []; }
+  catch { return []; }
+}
 
-  memoSaved.textContent = '保存しました';
-  memoSaved.classList.add('show');
-  clearTimeout(savedTimer);
-  savedTimer = setTimeout(() => memoSaved.classList.remove('show'), 2000);
+function saveMemos(memos) {
+  localStorage.setItem(STORAGE_KEYS.memos, JSON.stringify(memos));
+}
+
+function memoTitle(body) {
+  const first = body.split('\n')[0].trim();
+  return first || '無題のメモ';
+}
+
+function memoPreview(body) {
+  const lines = body.split('\n');
+  const rest = lines.slice(1).join(' ').trim();
+  return rest || '　';
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  if (d.toDateString() === now.toDateString()) {
+    return d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+  }
+  return d.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+}
+
+function renderMemoList() {
+  const memos = loadMemos();
+  const list = document.getElementById('memo-list');
+  const empty = document.getElementById('memo-empty');
+  const count = document.getElementById('memo-count');
+
+  list.innerHTML = '';
+  count.textContent = memos.length > 0 ? `${memos.length}件` : '';
+  empty.style.display = memos.length === 0 ? 'block' : 'none';
+
+  memos.slice().sort((a, b) => b.updatedAt - a.updatedAt).forEach(memo => {
+    const li = document.createElement('li');
+    li.className = 'memo-card';
+
+    const body = document.createElement('div');
+    body.className = 'memo-card-body';
+
+    const title = document.createElement('div');
+    title.className = 'memo-card-title';
+    title.textContent = memoTitle(memo.body);
+
+    const preview = document.createElement('div');
+    preview.className = 'memo-card-preview';
+    preview.textContent = memoPreview(memo.body);
+
+    body.append(title, preview);
+
+    const date = document.createElement('span');
+    date.className = 'memo-card-date';
+    date.textContent = formatDate(memo.updatedAt);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'delete-btn';
+    delBtn.textContent = '×';
+    delBtn.title = '削除';
+    delBtn.addEventListener('click', e => { e.stopPropagation(); deleteMemo(memo.id); });
+
+    li.append(body, date, delBtn);
+    li.addEventListener('click', () => openMemo(memo.id));
+    list.appendChild(li);
+  });
+}
+
+function openMemo(id) {
+  const memos = loadMemos();
+  const memo = memos.find(m => m.id === id);
+  if (!memo) return;
+
+  currentMemoId = id;
+  memoInput.value = memo.body;
+
+  document.getElementById('memo-list-view').style.display = 'none';
+  document.getElementById('memo-edit-view').style.display = 'block';
+  memoInput.focus();
+}
+
+function saveCurrentMemo(silent = false) {
+  if (!currentMemoId) return;
+  const memos = loadMemos();
+  const idx = memos.findIndex(m => m.id === currentMemoId);
+  if (idx === -1) return;
+
+  memos[idx].body = memoInput.value;
+  memos[idx].updatedAt = Date.now();
+  saveMemos(memos);
+
+  if (!silent) {
+    memoSaved.textContent = '保存しました';
+    memoSaved.classList.add('show');
+    clearTimeout(savedTimer);
+    savedTimer = setTimeout(() => memoSaved.classList.remove('show'), 2000);
+  }
+}
+
+function newMemo() {
+  const memo = { id: Date.now(), body: '', updatedAt: Date.now() };
+  const memos = loadMemos();
+  memos.unshift(memo);
+  saveMemos(memos);
+  openMemo(memo.id);
+}
+
+function deleteMemo(id) {
+  const memos = loadMemos();
+  const filtered = memos.filter(m => m.id !== id);
+  saveMemos(filtered);
+
+  if (currentMemoId === id) {
+    currentMemoId = null;
+    document.getElementById('memo-list-view').style.display = 'block';
+    document.getElementById('memo-edit-view').style.display = 'none';
+  }
+  renderMemoList();
+}
+
+// Auto-save while typing (debounce 600ms)
+memoInput.addEventListener('input', () => {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => saveCurrentMemo(true), 600);
 });
 
-// Auto-save memo on Ctrl+S / Cmd+S
+// Cmd+S / Ctrl+S
 memoInput.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
     e.preventDefault();
-    document.getElementById('memo-save').click();
+    saveCurrentMemo(false);
   }
+});
+
+document.getElementById('memo-new').addEventListener('click', newMemo);
+
+document.getElementById('memo-back').addEventListener('click', () => {
+  saveCurrentMemo(true);
+  currentMemoId = null;
+  document.getElementById('memo-list-view').style.display = 'block';
+  document.getElementById('memo-edit-view').style.display = 'none';
+  renderMemoList();
+});
+
+document.getElementById('memo-delete-current').addEventListener('click', () => {
+  if (currentMemoId) deleteMemo(currentMemoId);
 });
 
 // Init
